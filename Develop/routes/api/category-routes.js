@@ -50,26 +50,26 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
-  Category.update(
-    {
-      // All the fields you can update and the data attached to the request body.
+router.put('/:id', async (req, res) => {
+  try {
+    const categoryData = await Category.update({
       category_name: req.body.category_name,
     },
     {
-      // Gets a category based on the category_id given in the request parameters
       where: {
         category_id: req.params.category_id,
       },
-    }
-  )
-    .then((updatedCategory) => {
-      res.json(updatedCategory);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json(err);
     });
+
+    if (!categoryData) {
+      res.status(404).json({ message: 'No category found with this id!' });
+      return;
+    }
+
+    res.status(200).json(updatedCategory);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.delete('/:id', async (req, res) => {
